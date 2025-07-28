@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel = "stylesheet" href="static/css/style.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.rtl.min.css" integrity="sha384-Xbg45MqvDIk1e563NLpGEulpX6AvL404DP+/iCgW9eFa2BqztiwTexswJo2jLMue" crossorigin="anonymous">
+
+    <title>Car Price Predictor</title>
+  </head>
+
+  <body>
+  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card w-100 shadow" style="max-width: 600px;">
+      <div class="card-header text-center">
+        <h1>Car Price Predictor</h1>
+      </div>
+      <div class="card-body">
+        <form method="post" accept-charset="utf-8">
+          
+          <div class="mb-3">
+            <label for="company" class="form-label"><b>Select the Company</b></label>
+            <select class="form-select" id="company" name="company" required onchange="load_car_model(this.id,'car_model')">
+              <option value="" disabled selected>Select a company</option>  
+              {% for company in companies %}
+                    <option value="{{ company }}">{{ company }}</option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="car_model" class="form-label"><b>Select the Model</b></label>
+            <select class="form-select" id="car_model" name="car_model" required>
+              <option value="" disabled selected>Select a Model of the car</option>
+              {% for car_model in car_models %}
+                <option value="{{ car_model }}">{{ car_model }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="year" class="form-label"><b>Select the Year of Purchase</b></label>
+            <select class="form-select" id="year" name="year" required>
+              <option value="" disabled selected>Select a Year of Purchase</option>
+              {% for year in years %}
+                <option value="{{ year }}">{{ year }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="fuel_type" class="form-label"><b>Select the Fuel Type</b></label>
+            <select class="form-select" id="fuel_type" name="fuel_type" required>
+              <option value="" disabled selected>Select a Fuel Type</option>
+              {% for fuel_type in fuel_types %}
+                <option value="{{ fuel_type }}">{{ fuel_type }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="kms_travel" class="form-label"><b>Enter the number of Kilometers travelled</b></label>
+            <input type="text" class="form-control" id="kms_travel" name="kms_travel" placeholder="Enter the number of Kilometers travelled">
+          </div>
+
+          <div class="d-grid mt-4">
+            <button class="btn btn-primary" onclick="send_data()">Predict Price</button>
+          </div>
+
+        </form>
+        <br>
+        <div class="row">
+          <div class="col-12" style="text-align: center;">
+            <h3><span id="prediction"></span></h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+
+  // Step 1: Create a dictionary from Jinja
+  const carModels = {
+    {% for company in companies %}
+      "{{ company }}": [
+        {% for model in car_models %}
+          {% if company in model %}
+            "{{ model }}"{% if not loop.last %}, {% endif %}
+          {% endif %}
+        {% endfor %}
+      ]{% if not loop.last %}, {% endif %}
+    {% endfor %}
+  };
+
+  // Step 2: Load models based on selected company
+  function load_car_model(company_id, model_id) {
+    const companyValue = document.getElementById(company_id).value;
+    const carModelSelect = document.getElementById(model_id);
+
+    carModelSelect.innerHTML = ""; // Clear previous options
+
+    // Add a default disabled selected option
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.text = "Select a model of the car";
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    carModelSelect.appendChild(defaultOption);
+
+    if (carModels.hasOwnProperty(companyValue)) {
+      carModels[companyValue].forEach(function(model) {
+        const option = document.createElement("option");
+        option.value = model;
+        option.text = model;
+        carModelSelect.appendChild(option);
+      });
+    } else {
+      const option = document.createElement("option");
+      option.value = "";
+      option.text = "No models available";
+      carModelSelect.appendChild(option);
+    }
+  }
+
+  function form_handler(event){
+    event.preventDefault();
+  }
+
+
+  function send_data(){
+    // suppress form default behaviour
+    document.querySelector('form').addEventListener('submit',form_handler);
+
+    var fd = new FormData(document.querySelector('form'));
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/predict', true);
+    document.getElementById("prediction").innerHTML = "Wait! we are predicting the price...";
+
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState == XMLHttpRequest.DONE){
+        document.getElementById("prediction").innerHTML = "Prediction:- "+ xhr.responseText;
+      }
+    }
+
+    xhr.onload = function(){};
+    xhr.send(fd);
+  }
+
+</script>
+</body>
+
+</html>
