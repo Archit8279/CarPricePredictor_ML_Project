@@ -31,7 +31,3 @@ def predict():
                                              columns=['name','company','year', 'kms_driven', 'fuel_type']))
 
     return format_currency(prediction[0], 'INR', locale='en_IN')
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
