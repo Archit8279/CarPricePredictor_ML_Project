@@ -143,7 +143,11 @@
 
     xhr.onreadystatechange = function(){
       if(xhr.readyState == XMLHttpRequest.DONE){
-        document.getElementById("prediction").innerHTML = "Prediction:- "+ xhr.responseText;
+        if (xhr.responseText.startsWith("ERROR:")) {
+            document.getElementById("prediction").innerHTML = "<span style='color:red;'>" + xhr.responseText + "</span>";
+        } else {
+            document.getElementById("prediction").innerHTML = "Prediction:- "+ xhr.responseText;
+        }
       }
     }
 
