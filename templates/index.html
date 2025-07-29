@@ -143,12 +143,18 @@
 
     xhr.onreadystatechange = function(){
       if(xhr.readyState == XMLHttpRequest.DONE){
-        if (xhr.responseText.startsWith("ERROR:")) {
-            document.getElementById("prediction").innerHTML = "<span style='color:red;'>" + xhr.responseText + "</span>";
-        } else {
-            document.getElementById("prediction").innerHTML = "Prediction:- "+ xhr.responseText;
+        try 
+        {
+          let response = xhr.responseText;
+          if (response.startsWith("ERROR:")) {
+            document.getElementById("prediction").innerHTML = "<span style='color:red;'>" + response + "</span>";
+           } else {
+            document.getElementById("prediction").innerHTML = "Prediction: " + response;
+           } 
+          }catch (e) {
+          document.getElementById("prediction").innerHTML = "Server Error!";
+          }
         }
-      }
     }
 
     xhr.onload = function(){};
