@@ -27,7 +27,10 @@ def predict():
     fuel_type = request.form.get('fuel_type')
     kms_travel = int(request.form.get('kms_travel'))
 
-    prediction = model.predict(pd.DataFrame([[car_model, company, year, kms_travel, fuel_type]],
-                                             columns=['name','company','year', 'kms_driven', 'fuel_type']))
+    if not all([company, car_model, year, fuel_type, kms_travel]):
+        return "ERROR: Please fill all fields before submitting."
+    else:
+        prediction = model.predict(pd.DataFrame([[car_model, company, year, kms_travel, fuel_type]],
+                                             columns=['name', 'company', 'year', 'kms_driven', 'fuel_type']))
 
     return format_currency(prediction[0], 'INR', locale='en_IN')
