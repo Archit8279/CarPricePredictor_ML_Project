@@ -23,9 +23,17 @@ def index():
 def predict():
     company = request.form.get('company')
     car_model = request.form.get('car_model')
-    year = int(request.form.get('year'))
+    try:
+        year = int(request.form.get('year'))
+    except (ValueError, TypeError, KeyError):
+        return "ERROR: Please fill all fields before submitting."
+    
     fuel_type = request.form.get('fuel_type')
-    kms_travel = int(request.form.get('kms_travel'))
+    try:
+        kms_travel = int(request.form.get('kms_travel'))
+    except (ValueError, TypeError, KeyError):
+        return "ERROR: Please fill all fields before submitting."
+
 
     if not all([company, car_model, year, fuel_type, kms_travel]):
         return "ERROR: Please fill all fields before submitting."
